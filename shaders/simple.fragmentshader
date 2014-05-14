@@ -1,0 +1,14 @@
+#version 120
+
+uniform mat4 MVP;
+uniform sampler2D textureSampler;
+
+varying vec2 UV;
+
+void main()
+{
+
+	// Output color = red 
+	gl_FragColor = texture2D( textureSampler, UV );
+
+}
