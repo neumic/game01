@@ -17,85 +17,12 @@ import math
 
 from command import *
 from camera  import Camera
+from loaders import *
 
 HEIGHT = 512
 WIDTH = 512
 
-null = c_void_p(0)
-
-def loadOBJ(filename):
-   numVerts = 0
-   verts = []
-   uvs   = []
-   norms = []
-   vertsOut = []
-   uvsOut   = []
-   normsOut = []
-   for line in open(filename, "r"):
-      vals = line.split()
-      if vals[0] == "v":
-         v = list(map(float, vals[1:4]))
-         verts.append(v)
-      elif vals[0] == "vt":
-         n = list(map(float, vals[1:3]))
-         uvs.append(n)
-      elif vals[0] == "vn":
-         n = list(map(float, vals[1:4]))
-         norms.append(n)
-      elif vals[0] == "f":
-         for f in vals[1:]:
-            w = f.split("/")
-            # OBJ Files are 1-indexed so we must subtract 1 below
-            vertsOut.append(list(verts[int(w[0])-1]))
-            uvsOut.append(list(uvs[int(w[1])-1]))
-            normsOut.append(list(norms[int(w[2])-1]))
-            numVerts += 1
-   return array(vertsOut, dtype=float32), array(uvsOut, dtype=float32), array(normsOut)
-
-def loadShaders(vertFile, fragFile):
-   vertexShaderId = glCreateShader(GL_VERTEX_SHADER)
-   fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER)
-
-   with open( vertFile ) as f:
-      vertexShaderSource = f.read()
-      
-   with open( fragFile ) as f:
-      fragmentShaderSource = f.read()
-
-   glShaderSource(vertexShaderId, vertexShaderSource )
-   glCompileShader(vertexShaderId)
-   log = glGetShaderInfoLog(vertexShaderId)
-   if log: print('Vertex Shader: ', log)
-
-   glShaderSource(fragmentShaderId, fragmentShaderSource )
-   glCompileShader(fragmentShaderId)
-   log = glGetShaderInfoLog(fragmentShaderId)
-   if log: print('Fragment Shader: ', log)
-
-   programId = glCreateProgram()
-   glAttachShader(programId, vertexShaderId)
-   glAttachShader(programId, fragmentShaderId)
-   glLinkProgram(programId)
-
-   log = glGetProgramInfoLog(programId)
-   if log: print('Linked Program: ', log)
-
-   glDeleteShader( vertexShaderId )
-   glDeleteShader( fragmentShaderId )
-   
-   return programId
-
-
-def loadBMP( filename ):
-   texture = pygame.surfarray.array3d(pygame.image.load(filename) )
-   textureId = glGenTextures(1)
-   glBindTexture( GL_TEXTURE_2D, textureId )
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture.shape[0], texture.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, texture)
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-   glGenerateMipmap(GL_TEXTURE_2D)
-   return textureId
-   
+null = c_void_p(0) #handy trick from https://bitbucket.org/tartley/gltutpy/
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
