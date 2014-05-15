@@ -235,6 +235,7 @@ camera = Camera()
 
 inputHandler = InputHandler()
 inputHandler.keyBind( K_ESCAPE, quit )
+inputHandler.mouseMoveBind( print )
 
 ####FPS METER STUFF
 frames = 0 # counter for calculating fps
