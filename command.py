@@ -9,7 +9,6 @@ class InputHandler:
 
    def handleInput( self ):
       for event in pygame.event.get():
-         eventStackSize +=1
          print(event)
          if event.type == KEYDOWN:
             if event.key in self.keyBindings:

@@ -16,6 +16,7 @@ from ctypes import c_void_p
 import math
 
 from command import *
+from camera  import Camera
 
 HEIGHT = 512
 WIDTH = 512
@@ -84,21 +85,6 @@ def loadShaders(vertFile, fragFile):
    
    return programId
 
-def lookAtMatrix( camera, target, up ):
-   forward = vector.normalise(target - camera)
-   side = vector.normalise( vector.cross( forward, up ) )
-   #shifts 'up' to the camera's up
-   up = vector.cross( side, forward )
-
-   matrix2 = array(
-      [[ side[0], up[0], -forward[0], 0.0 ],
-       [ side[1], up[1], -forward[1], 0.0 ], 
-       [ side[2], up[2], -forward[2], 0.0 ], 
-       [     0.0,   0.0,         0.0, 1.0 ]],
-      dtype = float32)
-
-   return array(mat4.multiply( mat4.create_from_translation( -camera ), matrix2 ), dtype=float32)
-   #return array(matrix2 , dtype=float32)
 
 def loadBMP( filename ):
    texture = pygame.surfarray.array3d(pygame.image.load(filename) )
@@ -110,44 +96,11 @@ def loadBMP( filename ):
    glGenerateMipmap(GL_TEXTURE_2D)
    return textureId
    
-class Camera:
-   def __init__(self):
-      self.position = array([0,0,5])
-      self.horizontalAngle = 3.14
-      self.verticalAngle = 0.0
-      self.fov = 45.0
-      self.mouseSpeed = 0.0005
-
-   def getProjectionMatrix(self):
-      return array(mat4.create_perspective_projection_matrix( self.fov, WIDTH/HEIGHT, 0.1, 100.0 ), dtype=float32)
-
-   def getViewMatrix(self, timePassed):
-      #return lookAtMatrix( array([4.0,6.0,-7.0]), array([0.,0.,0.]), array([0.,1.,0.]) )
-      mouse_x,mouse_y = pygame.mouse.get_rel()
-      self.horizontalAngle += self.mouseSpeed * timePassed * mouse_x
-      self.verticalAngle   += self.mouseSpeed * timePassed * mouse_y
-      forward = array([ math.cos( self.verticalAngle ) * math.sin( self.horizontalAngle ),
-                        math.sin( self.verticalAngle ),
-                        math.cos( self.verticalAngle ) * math.cos( self.horizontalAngle ) ])
-      up = array([0.,-1.,0.,])
-      side = -vector.normalise( vector.cross( forward, up ) )
-      #shifts 'up' to the camera's up
-      up = vector.cross( side, forward )
-
-      matrix2 = array(
-         [[ side[0], up[0], forward[0], 0.0 ],
-          [ side[1], up[1], forward[1], 0.0 ], 
-          [ side[2], up[2], forward[2], 0.0 ], 
-          [     0.0,   0.0,         0.0, 1.0 ]],
-         dtype = float32)
-
-      return array(mat4.multiply( mat4.create_from_translation( [0.,0.,-9.,] ), matrix2 ), dtype=float32)
-
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
 pygame.mouse.set_visible( False )
-#pygame.event.set_grab( True ) 
+pygame.event.set_grab( True ) 
 #pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
 pygame.font.init()
@@ -235,7 +188,7 @@ camera = Camera()
 
 inputHandler = InputHandler()
 inputHandler.keyBind( K_ESCAPE, quit )
-inputHandler.mouseMoveBind( print )
+inputHandler.mouseMoveBind( camera.addRotations )
 
 ####FPS METER STUFF
 frames = 0 # counter for calculating fps
@@ -254,7 +207,7 @@ while True:
    timePassed = clock.tick()
 
    projection = camera.getProjectionMatrix()
-   view = camera.getViewMatrix(timePassed)
+   view = camera.getViewMatrix()
    model = array(mat4.create_identity(), dtype=float32)
    MVP = array( mat4.multiply(mat4.multiply(model, view), projection ), dtype=float32)
 
