@@ -15,6 +15,8 @@ from ctypes import c_void_p
 
 import math
 
+from command import *
+
 HEIGHT = 512
 WIDTH = 512
 
@@ -231,17 +233,16 @@ textureId = loadBMP( "textures/uvtemplate.bmp" )
 
 camera = Camera()
 
+inputHandler = InputHandler()
+inputHandler.keyBind( K_ESCAPE, quit )
+
 ####FPS METER STUFF
 frames = 0 # counter for calculating fps
 secondStart = 0 #initialize the first second
 fpsDisplay = fpsFont.render( str(0), False, (0,255,255) )
 
 while True:
-   for event in pygame.event.get():
-      if event.type == QUIT:
-         exit()
-      if event.type == KEYUP and event.key == K_ESCAPE:
-         exit()                
+   inputHandler.handleInput()
    
    glBindFramebuffer(GL_FRAMEBUFFER, framebufferName);
    glViewport(0,0,HEIGHT,WIDTH)
