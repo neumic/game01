@@ -20,18 +20,25 @@ def lookAtMatrix( camera, target, up ):
    #return array(matrix2 , dtype=float32)
 
 class Camera:
-   def __init__(self, fov = 45.0, aspect = 1.0):
+   def __init__(self, position = [0., 0., -9.], fov = 45.0, aspect = 1.0):
       self.position = array([0,0,5])
       self.horizontalAngle = 0.0
       self.verticalAngle = 0.0
       self.fov = fov
       self.aspect = aspect
+      self.projectionMatrix = None
+      self.viewMatrix = None
+      self.position = position
+      self.xMovement = 0.
+      self.yMovement = 0.
 
-   def getProjectionMatrix(self):
-      return array(mat4.create_perspective_projection_matrix( self.fov, self.aspect, 0.1, 100.0 ), dtype=float32)
+      self.regenProjectionMatrix()
+      self.regenViewMatrix()
 
-   def getViewMatrix(self):
-      #return lookAtMatrix( array([4.0,6.0,-7.0]), array([0.,0.,0.]), array([0.,1.,0.]) )
+   def regenProjectionMatrix(self):
+      self.projectionMatrix = array(mat4.create_perspective_projection_matrix( self.fov, self.aspect, 0.1, 100.0 ), dtype=float32)
+
+   def regenViewMatrix(self):
       forward = array([ math.cos( self.verticalAngle ) * math.sin( self.horizontalAngle ),
                         math.sin( self.verticalAngle ),
                         math.cos( self.verticalAngle ) * math.cos( self.horizontalAngle ) ])
@@ -47,9 +54,33 @@ class Camera:
           [     0.0,   0.0,         0.0, 1.0 ]],
          dtype = float32)
 
-      return array(mat4.multiply( mat4.create_from_translation( [0.,0.,-9.,] ), matrix2 ), dtype=float32)
+      self.position += forward * self.xMovement
+      self.position += side    * self.yMovement
+
+      self.xMovement = self.yMovement = 0.
+
+      self.viewMatrix =  array(mat4.multiply( mat4.create_from_translation( self.position ), matrix2 ), dtype=float32)
+
+   def getProjectionMatrix(self):
+      return self.projectionMatrix
+
+   def getViewMatrix( self ):
+      return self.viewMatrix
 
    def addRotations( self, x, y ):
       mouseSpeed = 0.0005
       self.horizontalAngle += mouseSpeed * x
       self.verticalAngle   += mouseSpeed * y
+
+   def moveForward( self ):
+      self.xMovement += 1.
+
+   def moveBackward( self ):
+      self.xMovement -= 1.
+
+   def moveLeft( self ):
+      self.yMovement += 1.
+
+   def moveRight( self ):
+      self.yMovement -= 1.
+

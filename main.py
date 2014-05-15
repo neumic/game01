@@ -188,6 +188,10 @@ camera = Camera()
 
 inputHandler = InputHandler()
 inputHandler.keyBind( K_ESCAPE, quit )
+inputHandler.keyBind( K_w, camera.moveForward )
+inputHandler.keyBind( K_s, camera.moveBackward )
+inputHandler.keyBind( K_a, camera.moveLeft )
+inputHandler.keyBind( K_d, camera.moveRight )
 inputHandler.mouseMoveBind( camera.addRotations )
 
 ####FPS METER STUFF
@@ -206,7 +210,9 @@ while True:
 
    timePassed = clock.tick()
 
+   camera.regenProjectionMatrix()
    projection = camera.getProjectionMatrix()
+   camera.regenViewMatrix()
    view = camera.getViewMatrix()
    model = array(mat4.create_identity(), dtype=float32)
    MVP = array( mat4.multiply(mat4.multiply(model, view), projection ), dtype=float32)
