@@ -1,5 +1,6 @@
 from numpy import array
 from numpy import float32
+import numpy
 
 from OpenGL.GL import *
 from OpenGL.arrays import vbo
@@ -16,6 +17,8 @@ from ctypes import c_void_p
 
 import math
 
+from numpy import random
+
 from command import *
 from camera  import Camera
 from loaders import *
@@ -25,34 +28,22 @@ WIDTH = 512
 
 null = c_void_p(0) #handy trick from https://bitbucket.org/tartley/gltutpy/
 
-def genTerrain():
+def genTerrain( length, breadth):
    verts = []
-   uvs   = []
-   norms = []
+   indices = []
+   _current_index = 0
 
-   for x in range(8):
-      for z in range(8):
+   for x in range(length):
+      for z in range(breadth):
          verts.append( [x,   0.0, z, ] )
-         verts.append( [x,   0.0, z+1] )
-         verts.append( [x+1, 0.0, z, ] )
-         verts.append( [x+1, 0.0, z, ] )
-         verts.append( [x+1, 0.0, z+1] )
-         verts.append( [x,   0.0, z+1] )
-         uvs.append( [x / 4., z / 4.] )
-         uvs.append( [x / 4., z / 4.] )
-         uvs.append( [x / 4., z / 4.] )
-         uvs.append( [x / 4., z / 4.] )
-         uvs.append( [x / 4., z / 4.] )
-         uvs.append( [x / 4., z / 4.] )
-         norms.append( [ 0., 1., 0.] )
-         norms.append( [ 0., 1., 0.] )
-         norms.append( [ 0., 1., 0.] )
-         norms.append( [ 0., 1., 0.] )
-         norms.append( [ 0., 1., 0.] )
-         norms.append( [ 0., 1., 0.] )
+         if x >= 1 and z >= 1:
+            indices.append( [ _current_index, _current_index - 1, _current_index - breadth ])
+         _current_index += 1
 
-   _vbo = vbo.VBO( array(verts, dtype='f') )
-   return _vbo
+
+   vert_vbo = vbo.VBO( array(verts, dtype='f') )
+   index_vbo = vbo.VBO( array(indices, dtype=numpy.int32), target = GL_ELEMENT_ARRAY_BUFFER )
+   return vert_vbo, index_vbo
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
@@ -73,7 +64,7 @@ programId = loadShaders( "shaders/simple.vertexshader", "shaders/simple.fragment
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-vbo = genTerrain()
+vert_vbo, index_vbo = genTerrain( 128, 128 )
 
 ##Framebuffer rendering code
 framebufferName = glGenFramebuffers(1)
@@ -165,14 +156,17 @@ while True:
    glBindTexture(GL_TEXTURE_2D, textureId)
    glUniform1i(textureSamplerId, 0);
 
-
-   vbo.bind()
    glEnableClientState(GL_VERTEX_ARRAY)
-   glVertexPointerf( vbo )
 
-   glDrawArrays(GL_TRIANGLES, 0, len(vbo))
+   vert_vbo.bind()
+   index_vbo.bind()
 
-   vbo.unbind()
+   glVertexPointerf( vert_vbo )
+
+   glDrawElements( GL_TRIANGLES, len(index_vbo.flat), GL_UNSIGNED_INT, index_vbo )
+
+   vert_vbo.unbind()
+   index_vbo.unbind()
    glDisableClientState(GL_VERTEX_ARRAY)
 
 ###DRAWING THE FULL SCREEN QUAD

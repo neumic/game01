@@ -6,10 +6,11 @@ class InputHandler:
       pygame.init() #Safe to call more than once
       self.keyBindings = {}
       self.mouseMoveBinding = None
+      pygame.key.set_repeat(True)
 
    def handleInput( self ):
       for event in pygame.event.get():
-         print(event)
+         #print(event)
          if event.type == KEYDOWN:
             if event.key in self.keyBindings:
                self.keyBindings[event.key]()
