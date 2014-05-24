@@ -36,7 +36,7 @@ class Camera:
       self.regenViewMatrix()
 
    def regenProjectionMatrix(self):
-      self.projectionMatrix = array(mat4.create_perspective_projection_matrix( self.fov, self.aspect, 0.1, 100.0 ), dtype=float32)
+      self.projectionMatrix = array(mat4.create_perspective_projection_matrix( self.fov, self.aspect, 0.1, 1000.0 ), dtype=float32)
 
    def regenViewMatrix(self):
       forward = array([ math.cos( self.verticalAngle ) * math.sin( self.horizontalAngle ),
