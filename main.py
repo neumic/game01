@@ -23,6 +23,8 @@ from command import *
 from camera  import Camera
 from loaders import *
 
+HEIGHT = 800
+WIDTH = 1280
 
 null = c_void_p(0) #handy trick from https://bitbucket.org/tartley/gltutpy/
 
@@ -36,6 +38,7 @@ def genTerrain( length, breadth):
          verts.append( [x,   0.0, z, ] )
          if x >= 1 and z >= 1:
             indices.append( [ _current_index, _current_index - 1, _current_index - breadth ])
+            indices.append( [ _current_index - breadth - 1, _current_index - 1, _current_index - breadth ])
          _current_index += 1
 
 
@@ -47,6 +50,7 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
 pygame.mouse.set_visible( False )
 pygame.event.set_grab( True ) 
+pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
 pygame.font.init()
 fpsFont = pygame.font.Font( pygame.font.get_default_font(), 14 )
