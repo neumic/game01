@@ -49,7 +49,9 @@ programId = loadShaders( "shaders/simple.vertexshader", "shaders/simple.fragment
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-vert_vbo, index_vbo = genTerrain( 128, 128 )
+vert_array, index_array = genTerrain( 128, 128 )
+vert_vbo = vbo.VBO( vert_array )
+index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
 ##Framebuffer rendering code
 framebufferName = glGenFramebuffers(1)
