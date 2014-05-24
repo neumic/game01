@@ -23,8 +23,6 @@ from command import *
 from camera  import Camera
 from loaders import *
 
-HEIGHT = 512
-WIDTH = 512
 
 null = c_void_p(0) #handy trick from https://bitbucket.org/tartley/gltutpy/
 
@@ -49,7 +47,6 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
 pygame.mouse.set_visible( False )
 pygame.event.set_grab( True ) 
-#pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
 pygame.font.init()
 fpsFont = pygame.font.Font( pygame.font.get_default_font(), 14 )
@@ -72,7 +69,7 @@ glBindFramebuffer( GL_FRAMEBUFFER, framebufferName )
 
 renderedTexture = glGenTextures(1)
 glBindTexture( GL_TEXTURE_2D, renderedTexture )
-glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, null)
+glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, HEIGHT, WIDTH, 0, GL_RGB, GL_UNSIGNED_BYTE, null)
 
 glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST )
 glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST )
