@@ -24,6 +24,34 @@ WIDTH = 512
 
 null = c_void_p(0) #handy trick from https://bitbucket.org/tartley/gltutpy/
 
+def genTerrain():
+   verts = []
+   uvs   = []
+   norms = []
+
+   for x in range(8):
+      for z in range(8):
+         verts.append( [x,   0.0, z, ] )
+         verts.append( [x,   0.0, z+1] )
+         verts.append( [x+1, 0.0, z, ] )
+         verts.append( [x+1, 0.0, z, ] )
+         verts.append( [x+1, 0.0, z+1] )
+         verts.append( [x,   0.0, z+1] )
+         uvs.append( [x / 4., z / 4.] )
+         uvs.append( [x / 4., z / 4.] )
+         uvs.append( [x / 4., z / 4.] )
+         uvs.append( [x / 4., z / 4.] )
+         uvs.append( [x / 4., z / 4.] )
+         uvs.append( [x / 4., z / 4.] )
+         norms.append( [ 0., 1., 0.] )
+         norms.append( [ 0., 1., 0.] )
+         norms.append( [ 0., 1., 0.] )
+         norms.append( [ 0., 1., 0.] )
+         norms.append( [ 0., 1., 0.] )
+         norms.append( [ 0., 1., 0.] )
+
+   return array(verts, dtype=float32), array(uvs, dtype=float32), array(norms, dtype=float32)
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
 pygame.mouse.set_visible( False )
@@ -43,8 +71,8 @@ programId = loadShaders( "shaders/simple.vertexshader", "shaders/simple.fragment
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-
-verts, uvs, norms = loadOBJ( "objects/suzanne.obj" )
+#verts, uvs, norms = loadOBJ( "objects/suzanne.obj" )
+verts, uvs, norms = genTerrain()
 
 vertBuffer = glGenBuffers(1)
 glBindBuffer( GL_ARRAY_BUFFER, vertBuffer )
@@ -105,13 +133,12 @@ quad_vertexPosition_modelspace = glGetAttribLocation(quad_programId, b'vertexPos
 texID = glGetUniformLocation(quad_programId, b'renderedTexture');
 timeID = glGetUniformLocation(quad_programId, b'time');
 
-
 vertexPosition_modelspaceID = glGetAttribLocation(programId, b'vertexPosition_modelspace')
 vertexUVId = glGetAttribLocation(programId, b'vertexUV')
 
 textureId = loadBMP( "textures/uvtemplate.bmp" )
 
-camera = Camera()
+camera = Camera(position = [0.0, -2.0, -9.0])
 
 inputHandler = InputHandler()
 inputHandler.keyBind( K_ESCAPE, quit )

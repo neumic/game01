@@ -20,7 +20,7 @@ def lookAtMatrix( camera, target, up ):
    #return array(matrix2 , dtype=float32)
 
 class Camera:
-   def __init__(self, position = [0., 0., -9.], fov = 45.0, aspect = 1.0):
+   def __init__(self, position = [0., 0., 0.], fov = 45.0, aspect = 1.0):
       self.position = array([0,0,5])
       self.horizontalAngle = 0.0
       self.verticalAngle = 0.0
@@ -68,7 +68,7 @@ class Camera:
       return self.viewMatrix
 
    def addRotations( self, x, y ):
-      mouseSpeed = 0.0005
+      mouseSpeed = 0.0015
       self.horizontalAngle += mouseSpeed * x
       self.verticalAngle   += mouseSpeed * y
 
