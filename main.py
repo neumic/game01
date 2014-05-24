@@ -2,6 +2,7 @@ from numpy import array
 from numpy import float32
 
 from OpenGL.GL import *
+from OpenGL.arrays import vbo
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
@@ -50,7 +51,8 @@ def genTerrain():
          norms.append( [ 0., 1., 0.] )
          norms.append( [ 0., 1., 0.] )
 
-   return array(verts, dtype=float32), array(uvs, dtype=float32), array(norms, dtype=float32)
+   _vbo = vbo.VBO( array(verts, dtype='f') )
+   return _vbo
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
@@ -71,20 +73,7 @@ programId = loadShaders( "shaders/simple.vertexshader", "shaders/simple.fragment
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-#verts, uvs, norms = loadOBJ( "objects/suzanne.obj" )
-verts, uvs, norms = genTerrain()
-
-vertBuffer = glGenBuffers(1)
-glBindBuffer( GL_ARRAY_BUFFER, vertBuffer )
-glBufferData( GL_ARRAY_BUFFER, verts, GL_STATIC_DRAW )
-
-UVBuffer = glGenBuffers(1)
-glBindBuffer( GL_ARRAY_BUFFER, UVBuffer )
-glBufferData( GL_ARRAY_BUFFER, uvs, GL_STATIC_DRAW )
-
-normBuffer = glGenBuffers(1)
-glBindBuffer( GL_ARRAY_BUFFER, normBuffer )
-glBufferData( GL_ARRAY_BUFFER, norms, GL_STATIC_DRAW )
+vbo = genTerrain()
 
 ##Framebuffer rendering code
 framebufferName = glGenFramebuffers(1)
@@ -176,21 +165,15 @@ while True:
    glBindTexture(GL_TEXTURE_2D, textureId)
    glUniform1i(textureSamplerId, 0);
 
-   glBindBuffer(GL_ARRAY_BUFFER, vertBuffer)
-   glEnableVertexAttribArray(vertexPosition_modelspaceID)
-   glVertexAttribPointer( vertexPosition_modelspaceID, 3, GL_FLOAT, GL_FALSE, 0, null )
 
-   glEnableVertexAttribArray(1)
-   glBindBuffer(GL_ARRAY_BUFFER, UVBuffer)
-   glVertexAttribPointer( vertexUVId, 2, GL_FLOAT, GL_FALSE, 0, null )
+   vbo.bind()
+   glEnableClientState(GL_VERTEX_ARRAY)
+   glVertexPointerf( vbo )
 
-   glEnableVertexAttribArray(2)
-   glBindBuffer( GL_ARRAY_BUFFER, normBuffer )
-   glVertexAttribPointer( 2, 3, GL_FLOAT, GL_FALSE, 0, null )
+   glDrawArrays(GL_TRIANGLES, 0, len(vbo))
 
-   glDrawArrays( GL_TRIANGLES, 0, len( verts ) )
-   glDisableVertexAttribArray(vertexPosition_modelspaceID)
-   glDisableVertexAttribArray( vertexUVId )
+   vbo.unbind()
+   glDisableClientState(GL_VERTEX_ARRAY)
 
 ###DRAWING THE FULL SCREEN QUAD
    glBindFramebuffer(GL_FRAMEBUFFER, 0)
