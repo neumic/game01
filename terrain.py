@@ -1,6 +1,7 @@
 import noise
+import pyrr
 from OpenGL.arrays import vbo
-from numpy import array, float32, int32
+from numpy import array, float32, int32, zeros, ones, transpose, concatenate
 
 def genTerrain( length, breadth):
    verts = []
@@ -18,4 +19,15 @@ def genTerrain( length, breadth):
    vert_array = array(verts, dtype=float32)
    index_array = array(indices, dtype=int32)
 
-   return vert_array, index_array
+   norm_dict = {}
+   #for face in index_array:
+      #for vert_index in face:
+         #if vert_index not in norm_dict:'kernel' has bad input: nil
+            #norm_dict[vert_index] = []
+         #norm_dict[vert_index].append(pyrr.vector.generate_normals(*vert_array[face]))
+
+   norm_array = ones(vert_array.shape, dtype=float32)
+   #for norm_index in range(len( norm_array ) ):
+      #norm_array[norm_index] = pyrr.vector.normalise( sum(norm_dict[norm_index]) )
+
+   return vert_array, norm_array, index_array

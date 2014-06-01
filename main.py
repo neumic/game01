@@ -49,8 +49,8 @@ programId = loadShaders( "shaders/simple.vertexshader", "shaders/simple.fragment
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-vert_array, index_array = genTerrain( 128, 128 )
-vert_vbo = vbo.VBO( vert_array )
+vert_array, norm_array, index_array = genTerrain( 256, 256 )
+vert_norm_vbo = vbo.VBO( numpy.concatenate( (vert_array, norm_array) ) )
 index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
 ##Framebuffer rendering code
@@ -144,17 +144,19 @@ while True:
    glUniform1i(textureSamplerId, 0);
 
    glEnableClientState(GL_VERTEX_ARRAY)
-
-   vert_vbo.bind()
+   glEnableClientState(GL_NORMAL_ARRAY)
+   vert_norm_vbo.bind()
    index_vbo.bind()
 
-   glVertexPointerf( vert_vbo )
+   glVertexPointerf( vert_norm_vbo )
+   glNormalPointerf( vert_norm_vbo + len(vert_array) )
 
    glDrawElements( GL_TRIANGLES, len(index_vbo.flat), GL_UNSIGNED_INT, index_vbo )
 
-   vert_vbo.unbind()
+   vert_norm_vbo.unbind()
    index_vbo.unbind()
    glDisableClientState(GL_VERTEX_ARRAY)
+   glDisableClientState(GL_NORMAL_ARRAY)
 
 ###DRAWING THE FULL SCREEN QUAD
    glBindFramebuffer(GL_FRAMEBUFFER, 0)
