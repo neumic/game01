@@ -31,7 +31,8 @@ null = c_void_p(0) #handy trick from https://bitbucket.org/tartley/gltutpy/
 
 
 pygame.init()
-screen = pygame.display.set_mode((WIDTH,HEIGHT), HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT)
+screen = pygame.display.set_mode( (WIDTH,HEIGHT),
+   HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT )
 pygame.mouse.set_visible( False )
 pygame.event.set_grab( True ) 
 pygame.display.toggle_fullscreen()
@@ -45,7 +46,8 @@ glDepthFunc(GL_LESS)
 
 glClearColor( 0.1, 0.1, 0.5, 0. )
 
-programId = loadShaders( "shaders/simple.vertexshader", "shaders/simple.fragmentshader" )
+programId = loadShaders( "shaders/simple.vertexshader",
+                         "shaders/simple.fragmentshader" )
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
@@ -59,22 +61,24 @@ glBindFramebuffer( GL_FRAMEBUFFER, framebufferName )
 
 renderedTexture = glGenTextures(1)
 glBindTexture( GL_TEXTURE_2D, renderedTexture )
-glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, HEIGHT, WIDTH, 0, GL_RGB, GL_UNSIGNED_BYTE, null)
+glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB,
+              HEIGHT, WIDTH, 0, GL_RGB, GL_UNSIGNED_BYTE, null )
 
 glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST )
 glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST )
 
 depthTexture = glGenTextures(1)
-glBindTexture(GL_TEXTURE_2D, depthTexture)
-glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, HEIGHT, WIDTH, 0,GL_DEPTH_COMPONENT, GL_FLOAT, null)
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+glBindTexture( GL_TEXTURE_2D, depthTexture )
+glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24,
+             HEIGHT, WIDTH, 0,GL_DEPTH_COMPONENT, GL_FLOAT, null )
+glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST )
+glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST )
+glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE )
+glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE )
 
-glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0)
+glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0)
 
-glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0)
+glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0)
 
 drawBuffers = [GL_COLOR_ATTACHMENT0]
 glDrawBuffers(1, drawBuffers)
