@@ -73,14 +73,14 @@ class Camera:
       self.verticalAngle   += mouseSpeed * y
 
    def moveForward( self ):
-      self.xMovement += .1
+      self.xMovement += .3
 
    def moveBackward( self ):
-      self.xMovement -= .1
+      self.xMovement -= .3
 
    def moveLeft( self ):
-      self.yMovement += .1
+      self.yMovement += .3
 
    def moveRight( self ):
-      self.yMovement -= .1
+      self.yMovement -= .3
 
