@@ -76,3 +76,58 @@ def genTree( height, position ):
 
    return tree_verts, tree_norms, tree_indices
 
+class Terrain:
+   def __init__( self, length, breadth ):
+      self.length = length
+      self.breadth = breadth
+      self.regen_arrays()
+      
+      pass
+
+   def gen_row( self, row ):
+      pass
+
+   def gen_col( self, col ):
+      pass
+   
+   def regen_arrays( self ):
+      verts = []
+      indices = []
+      _current_index = 0
+
+      for x in range(self.length):
+         for z in range(self.breadth):
+            verts.append( [x, terrainNoise( x,z, self.length, self.breadth ), z ] )
+            if x >= 1 and z >= 1:
+               indices.append( [ _current_index,
+                                 _current_index - 1,
+                                 _current_index - self.breadth ])
+               indices.append( [ _current_index - self.breadth - 1,
+                                 _current_index - 1,
+                                 _current_index - self.breadth ])
+            _current_index += 1
+
+         
+      trees = genTrees( self.length, self.breadth, 2400)
+      
+      offset = len(verts)
+      verts += trees[0]
+      self.vert_array = array(verts, dtype=float32)
+      for face in trees[2]:
+         indices.append(list( map( lambda x: x + offset, face ) ) )
+      self.index_array = array(indices, dtype=int32)
+
+      norm_dict = {}
+      #for face in index_array:
+         #for vert_index in face:
+            #if vert_index not in norm_dict:'kernel' has bad input: nil
+               #norm_dict[vert_index] = []
+            #norm_dict[vert_index].append(pyrr.vector.generate_normals(*vert_array[face]))
+
+      self.norm_array = ones(self.vert_array.shape, dtype=float32)
+      #for norm_index in range(len( norm_array ) ):
+         #norm_array[norm_index] = pyrr.vector.normalise( sum(norm_dict[norm_index]) )
+
+   def get_arrays( self ):
+      return self.vert_array, self.norm_array, self.index_array
+

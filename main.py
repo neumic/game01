@@ -22,7 +22,7 @@ from numpy import random
 from command import *
 from camera  import Camera
 from loaders import *
-from terrain import genTerrain
+from terrain import Terrain
 
 HEIGHT = 800
 WIDTH = 1280
@@ -51,7 +51,8 @@ programId = loadShaders( "shaders/simple.vertexshader",
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-vert_array, norm_array, index_array = genTerrain( 256, 256 )
+terrain = Terrain( 256, 256 )
+vert_array, norm_array, index_array = terrain.get_arrays()
 vert_norm_vbo = vbo.VBO( numpy.concatenate( (vert_array, norm_array) ) )
 index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
