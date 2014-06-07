@@ -21,7 +21,6 @@ def lookAtMatrix( camera, target, up ):
 
 class Camera:
    def __init__(self, position = [0., 0., 0.], fov = 45.0, aspect = 1.0):
-      self.position = array([0,0,5])
       self.horizontalAngle = 0.0
       self.verticalAngle = 0.0
       self.fov = fov

@@ -1,5 +1,6 @@
 from numpy import array
 from numpy import float32
+from numpy import random
 import numpy
 
 from OpenGL.GL import *
@@ -17,7 +18,6 @@ from ctypes import c_void_p
 
 import math
 
-from numpy import random
 
 from command import *
 from camera  import Camera
@@ -51,7 +51,9 @@ programId = loadShaders( "shaders/simple.vertexshader",
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 
-terrain = Terrain( 256, 256 )
+camera = Camera(position = [9.0, -2.0, 9.0])
+
+terrain = Terrain( 256, 256, numpy.copy(camera.position ) )
 vert_array, norm_array, index_array = terrain.get_arrays()
 vert_norm_vbo = vbo.VBO( numpy.concatenate( (vert_array, norm_array) ) )
 index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
@@ -110,7 +112,6 @@ vertexUVId = glGetAttribLocation(programId, b'vertexUV')
 
 textureId = loadBMP( "textures/uvtemplate.bmp" )
 
-camera = Camera(position = [0.0, -2.0, -9.0])
 
 inputHandler = InputHandler()
 inputHandler.keyBind( K_ESCAPE, quit )
@@ -123,6 +124,7 @@ inputHandler.mouseMoveBind( camera.addRotations )
 ####FPS METER STUFF
 frames = 0 # counter for calculating fps
 secondStart = 0 #initialize the first second
+subsecondStart = 0 #initialize the first second
 fpsDisplay = fpsFont.render( str(0), False, (0,255,255) )
 
 while True:
@@ -181,11 +183,20 @@ while True:
 ####FPS METER STUFF
    frames += 1
    time = pygame.time.get_ticks()
+   #Every second stuff
    if time - secondStart > 1000:
       fps = frames * 1000 / (time - secondStart)
       secondStart = time
       frames = 0
       fpsDisplay = fpsFont.render( str(fps), False, (0,255,255) )
+
+
+   if time - subsecondStart > 100:
+      subsecondStart = time
+      terrain.upshift_row( )
+      vert_array = terrain.get_vert_array()
+      vert_norm_vbo = vbo.VBO( numpy.concatenate( (vert_array, norm_array) ) )
+      index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
    glViewport(0,0, WIDTH, HEIGHT )
    glMatrixMode(GL_PROJECTION)
