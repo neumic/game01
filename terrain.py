@@ -5,7 +5,7 @@ from numpy import array, float32, int32, zeros, ones, transpose, concatenate
 import random
 
 def terrainNoise( x, z, length, breadth):
-   return 128 * noise.pnoise2(x/length,z/breadth, octaves=3)
+   return 0.0
 
 def genTerrain( length, breadth):
    verts = []
@@ -21,13 +21,7 @@ def genTerrain( length, breadth):
          _current_index += 1
 
       
-   trees = genTrees( length, breadth, 2400)
-   
-   offset = len(verts)
-   verts += trees[0]
    vert_array = array(verts, dtype=float32)
-   for face in trees[2]:
-      indices.append(list( map( lambda x: x + offset, face ) ) )
    index_array = array(indices, dtype=int32)
 
    norm_dict = {}
@@ -102,19 +96,13 @@ class Terrain:
                indices.append( [ _current_index,
                                  _current_index - 1,
                                  _current_index - self.breadth ])
-               indices.append( [ _current_index - self.breadth - 1,
-                                 _current_index - 1,
-                                 _current_index - self.breadth ])
+              #indices.append( [ _current_index - self.breadth - 1,
+              #                  _current_index - 1,
+              #                  _current_index - self.breadth ])
             _current_index += 1
 
          
-      trees = genTrees( self.length, self.breadth, 2400)
-      
-      offset = len(verts)
-      verts += trees[0]
       self.vert_array = array(verts, dtype=float32)
-      for face in trees[2]:
-         indices.append(list( map( lambda x: x + offset, face ) ) )
       self.index_array = array(indices, dtype=int32)
 
       norm_dict = {}

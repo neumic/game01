@@ -46,10 +46,11 @@ glDepthFunc(GL_LESS)
 
 glClearColor( 0.1, 0.1, 0.5, 0. )
 
-programId = loadShaders( "shaders/simple.vertexshader",
+programId = loadShaders( "shaders/terrain_noise.vertexshader",
                          "shaders/simple.fragmentshader" )
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
+offsetId = glGetUniformLocation( programId, b'offset' )
 
 terrain = Terrain( 256, 256 )
 vert_array, norm_array, index_array = terrain.get_arrays()
@@ -147,6 +148,8 @@ while True:
    glActiveTexture(GL_TEXTURE0)
    glBindTexture(GL_TEXTURE_2D, textureId)
    glUniform1i(textureSamplerId, 0);
+
+   glUniform3fv( offsetId, 1, camera.position + [128.,0.,128] )
 
    glEnableClientState(GL_VERTEX_ARRAY)
    glEnableClientState(GL_NORMAL_ARRAY)
