@@ -1,7 +1,9 @@
 import noise
 import pyrr
 from OpenGL.arrays import vbo
-from numpy import array, float32, int32, zeros, ones, transpose, concatenate
+from numpy import array, float32, int32, zeros, ones, zeros_like, concatenate, vstack, hstack, column_stack
+from scipy.spatial import Delaunay
+from numpy.random import multivariate_normal, triangular
 import random
 
 def terrainNoise( x, z, length, breadth):
@@ -74,7 +76,7 @@ class Terrain:
    def __init__( self, length, breadth ):
       self.length = length
       self.breadth = breadth
-      self.regen_arrays()
+      self.gen_random_delaunay()
       
       pass
 
@@ -83,6 +85,17 @@ class Terrain:
 
    def gen_col( self, col ):
       pass
+
+   def gen_random_delaunay( self ):
+      #points = array( multivariate_normal([0,0], [[128**2,0], [0,128**2]], 256**2), dtype=float32)
+      points = array( column_stack( [triangular( -3000., 0., 3000, 90000 ), triangular( -3000., 0., 3000., 90000)] ) )
+      print( points )
+      delaunay = Delaunay( points )
+      t = points.transpose()
+      points = vstack(( t[0], zeros_like(t[0]), t[1])).transpose()
+
+      self.vert_array = array(points, dtype=float32)
+      self.index_array = delaunay.simplices
    
    def regen_arrays( self ):
       verts = []
@@ -105,17 +118,6 @@ class Terrain:
       self.vert_array = array(verts, dtype=float32)
       self.index_array = array(indices, dtype=int32)
 
-      norm_dict = {}
-      #for face in index_array:
-         #for vert_index in face:
-            #if vert_index not in norm_dict:'kernel' has bad input: nil
-               #norm_dict[vert_index] = []
-            #norm_dict[vert_index].append(pyrr.vector.generate_normals(*vert_array[face]))
-
-      self.norm_array = ones(self.vert_array.shape, dtype=float32)
-      #for norm_index in range(len( norm_array ) ):
-         #norm_array[norm_index] = pyrr.vector.normalise( sum(norm_dict[norm_index]) )
-
    def get_arrays( self ):
-      return self.vert_array, self.norm_array, self.index_array
+      return self.vert_array, self.index_array
 

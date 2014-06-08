@@ -40,7 +40,7 @@ clock = pygame.time.Clock()
 pygame.font.init()
 fpsFont = pygame.font.Font( pygame.font.get_default_font(), 14 )
 
-#glEnable( GL_CULL_FACE )
+glEnable( GL_CULL_FACE )
 glEnable( GL_DEPTH_TEST )
 glDepthFunc(GL_LESS)
 
@@ -51,10 +51,11 @@ programId = loadShaders( "shaders/terrain_noise.vertexshader",
 matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 offsetId = glGetUniformLocation( programId, b'offset' )
+iterationId = glGetUniformLocation( programId, b'noiseIteration' )
 
 terrain = Terrain( 256, 256 )
-vert_array, norm_array, index_array = terrain.get_arrays()
-vert_norm_vbo = vbo.VBO( numpy.concatenate( (vert_array, norm_array) ) )
+vert_array, index_array = terrain.get_arrays()
+vert_vbo = vbo.VBO( vert_array )
 index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
 ##Framebuffer rendering code
@@ -149,22 +150,20 @@ while True:
    glBindTexture(GL_TEXTURE_2D, textureId)
    glUniform1i(textureSamplerId, 0);
 
-   glUniform3fv( offsetId, 1, camera.position + [128.,0.,128] )
+   glUniform1f( iterationId, 1.0)
+   glUniform3fv( offsetId, 1, camera.position - [1.,0.,1.] )
 
    glEnableClientState(GL_VERTEX_ARRAY)
-   glEnableClientState(GL_NORMAL_ARRAY)
-   vert_norm_vbo.bind()
+   vert_vbo.bind()
    index_vbo.bind()
 
-   glVertexPointerf( vert_norm_vbo )
-   glNormalPointerf( vert_norm_vbo + len(vert_array) )
+   glVertexPointerf( vert_vbo )
 
    glDrawElements( GL_TRIANGLES, len(index_vbo.flat), GL_UNSIGNED_INT, index_vbo )
 
-   vert_norm_vbo.unbind()
+   vert_vbo.unbind()
    index_vbo.unbind()
    glDisableClientState(GL_VERTEX_ARRAY)
-   glDisableClientState(GL_NORMAL_ARRAY)
 
 ###DRAWING THE FULL SCREEN QUAD
    glBindFramebuffer(GL_FRAMEBUFFER, 0)

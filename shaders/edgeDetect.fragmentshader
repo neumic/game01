@@ -42,7 +42,7 @@ float IsEdge(in vec2 coords){
          abs(pix[2]-pix[6])
          )/4.;
 
-   return threshold(0.1,0.51,clamp(5.8*delta,0.0,1.0));
+   return threshold(0.1,0.81,clamp(80.0*delta,0.0,1.0));
 }
 
 void main()
@@ -51,7 +51,7 @@ void main()
    float depth = get_pixel(UV, 0.0, 0.0).r;
    float edge = IsEdge(UV) * depth;
    color = ( 1.0 - color );
-   color *= 10.0;
+   color *= 80.0;
    //gl_FragColor = vec4( edge+color.r, edge+color.g, edge+color.b, 1.0 );
    //gl_FragColor = color;
    gl_FragColor = vec4( 1.0 - edge - color.r, 1.0 - edge - color.g, 1.0 - edge - color.b, 1.0 );

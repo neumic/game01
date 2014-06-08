@@ -36,7 +36,7 @@ class Camera:
       self.regenViewMatrix()
 
    def regenProjectionMatrix(self):
-      self.projectionMatrix = array(mat4.create_perspective_projection_matrix( self.fov, self.aspect, 0.1, 1000.0 ), dtype=float32)
+      self.projectionMatrix = array(mat4.create_perspective_projection_matrix( self.fov, self.aspect, 0.1, 3000.0 ), dtype=float32)
 
    def regenViewMatrix(self):
       forward = array([ math.cos( self.verticalAngle ) * math.sin( self.horizontalAngle ),
@@ -73,14 +73,14 @@ class Camera:
       self.verticalAngle   += mouseSpeed * y
 
    def moveForward( self ):
-      self.xMovement += .3
+      self.xMovement += .5
 
    def moveBackward( self ):
-      self.xMovement -= .3
+      self.xMovement -= .5
 
    def moveLeft( self ):
-      self.yMovement += .3
+      self.yMovement += .5
 
    def moveRight( self ):
-      self.yMovement -= .3
+      self.yMovement -= .5
 
