@@ -41,18 +41,16 @@ def genTerrain( length, breadth):
 
 def genTrees( length, breadth, number ):
    tree_verts = []
-   tree_norms = []
    tree_indices = []
    for num in range( number ):
       x = random.random() * length
       z = random.random() * breadth
-      trees = genTree( 20, array([ x, terrainNoise( x, z, length, breadth) - 1, z]))
-      for face in trees[2]:
+      trees = genTree( 20, array([ x, 0.0, z]))
+      for face in trees[1]:
          tree_indices.append(list( map( lambda x: x + len(tree_verts), face ) ))
       tree_verts += trees[0]
-      tree_norms += trees[1]
 
-   return tree_verts, tree_norms, tree_indices
+   return array( tree_verts, dtype=float32 ), array( tree_indices )
    
 def genTree( height, position ):
    tree_verts = [
@@ -65,12 +63,7 @@ def genTree( height, position ):
       [0,1,2],
       [0,1,3]]
 
-   tree_norms = [[1.,1.,1.],
-                 [1.,1.,1.],
-                 [1.,1.,1.],
-                 [1.,1.,1.]]
-
-   return tree_verts, tree_norms, tree_indices
+   return tree_verts, tree_indices
 
 class Terrain:
    def __init__( self, length, breadth ):
@@ -87,9 +80,8 @@ class Terrain:
       pass
 
    def gen_random_delaunay( self ):
-      #points = array( multivariate_normal([0,0], [[128**2,0], [0,128**2]], 256**2), dtype=float32)
-      points = array( column_stack( [triangular( -3000., 0., 3000, 90000 ), triangular( -3000., 0., 3000., 90000)] ) )
-      print( points )
+      points = array( multivariate_normal([0,0], [[128**2,0], [0,128**2]], 256**2), dtype=float32)
+      #points = array( column_stack( [triangular( -3000., 0., 3000, 90000 ), triangular( -3000., 0., 3000., 90000)] ) )
       delaunay = Delaunay( points )
       t = points.transpose()
       points = vstack(( t[0], zeros_like(t[0]), t[1])).transpose()
