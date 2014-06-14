@@ -288,24 +288,16 @@ vec3 calcValue(vec3 v)
 	return vec3(n, n, n);
 }
 
-float fullcalc( float x, float z ){
-   return 2.0 * snoise( vec3(0.1 * x, 0.0, 0.1 * z) ) + 16.0 * snoise(vec3(0.025* x, 0.0, 0.025* z) );
-}
-
-float halfcalc( float x, float z ){
-   return 16.0 * snoise(vec3(0.025* x, 0.0, 0.025* z) );
-}
-
 void main(){
-   float y = vertexPosition_modelspace.y - offset.y;
-   float x = abs(1.0 + 0.5 / offset.y) * (vertexPosition_modelspace.x - offset.x);
-   float z = abs(1.0 + 0.5 / offset.y) * (vertexPosition_modelspace.z - offset.z);
+   float y = vertexPosition_modelspace.y;
+   float x = vertexPosition_modelspace.x;
+   float z = vertexPosition_modelspace.z;
 
    float aprox_dist = abs(vertexPosition_modelspace.x) + abs(vertexPosition_modelspace.z);
-   x += sin(aprox_dist * 0.005) * sin(0.1 * time + x);
-   z += sin(aprox_dist * 0.005) * sin(0.1 * time + z);
+   x += (aprox_dist * 0.01 + 1) * sin(0.1 * time + x);
+   z += (aprox_dist * 0.01 + 1) * sin(0.1 * time + z);
 
-	float height =  fullcalc(x,z) - halfcalc(-offset.x, -offset.z) -12.0;
+	float height = 32.0 * snoise(vec3(0.01* (x - offset.x), 0.0, 0.01* (z - offset.z) ) ) - 32 * snoise( vec3(-0.01*offset.x,0.0,-0.01*offset.z) ) - 4;
 
 
 	gl_Position =  MVP * vec4(x, height, z, 1.0);

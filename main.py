@@ -52,6 +52,7 @@ matrixId = glGetUniformLocation( programId, b'MVP' )
 textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 offsetId = glGetUniformLocation( programId, b'offset' )
 iterationId = glGetUniformLocation( programId, b'noiseIteration' )
+timeId = glGetUniformLocation( programId, b'time' )
 
 terrain = Terrain( 256, 256 )
 vert_array, index_array = terrain.get_arrays()
@@ -105,7 +106,7 @@ glBufferData(GL_ARRAY_BUFFER, quad_verts, GL_STATIC_DRAW)
 quad_programId = loadShaders( "shaders/Passthrough.vertexshader", "shaders/edgeDetect.fragmentshader" )
 quad_vertexPosition_modelspace = glGetAttribLocation(quad_programId, b'vertexPosition_modelspace');
 texID = glGetUniformLocation(quad_programId, b'renderedTexture');
-timeID = glGetUniformLocation(quad_programId, b'time');
+#timeID = glGetUniformLocation(quad_programId, b'time');
 
 vertexPosition_modelspaceID = glGetAttribLocation(programId, b'vertexPosition_modelspace')
 vertexUVId = glGetAttribLocation(programId, b'vertexUV')
@@ -124,6 +125,7 @@ inputHandler.mouseMoveBind( camera.addRotations )
 
 ####FPS METER STUFF
 frames = 0 # counter for calculating fps
+time = pygame.time.get_ticks()
 secondStart = 0 #initialize the first second
 fpsDisplay = fpsFont.render( str(0), False, (0,255,255) )
 
@@ -150,8 +152,9 @@ while True:
    glBindTexture(GL_TEXTURE_2D, textureId)
    glUniform1i(textureSamplerId, 0);
 
-   glUniform1f( iterationId, 1.0)
-   glUniform3fv( offsetId, 1, camera.position - [1.,0.,1.] )
+   glUniform1f( iterationId, 6.0)
+   glUniform1f( timeId, time/100.0 )
+   glUniform3fv( offsetId, 1, array(camera.position ) )
 
    glEnableClientState(GL_VERTEX_ARRAY)
    vert_vbo.bind()

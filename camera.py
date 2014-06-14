@@ -3,6 +3,8 @@ from pyrr import matrix44 as mat4
 from pyrr import vector
 import math
 
+CAMERA_SPEED = 2.5
+
 def lookAtMatrix( camera, target, up ):
    forward = vector.normalise(target - camera)
    side = vector.normalise( vector.cross( forward, up ) )
@@ -21,7 +23,6 @@ def lookAtMatrix( camera, target, up ):
 
 class Camera:
    def __init__(self, position = [0., 0., 0.], fov = 45.0, aspect = 1.0):
-      self.position = array([0,0,5])
       self.horizontalAngle = 0.0
       self.verticalAngle = 0.0
       self.fov = fov
@@ -47,7 +48,7 @@ class Camera:
       #shifts 'up' to the camera's up
       up = vector.cross( side, forward )
 
-      matrix2 = array(
+      directionMatrix = array(
          [[ side[0], up[0], forward[0], 0.0 ],
           [ side[1], up[1], forward[1], 0.0 ], 
           [ side[2], up[2], forward[2], 0.0 ], 
@@ -56,10 +57,10 @@ class Camera:
 
       self.position += forward * self.xMovement
       self.position += side    * self.yMovement
+      self.position[1] = 2.0
 
       self.xMovement = self.yMovement = 0.
-
-      self.viewMatrix =  array(mat4.multiply( mat4.create_from_translation( self.position ), matrix2 ), dtype=float32)
+      self.viewMatrix = directionMatrix
 
    def getProjectionMatrix(self):
       return self.projectionMatrix
@@ -73,14 +74,14 @@ class Camera:
       self.verticalAngle   += mouseSpeed * y
 
    def moveForward( self ):
-      self.xMovement += .5
+      self.xMovement += CAMERA_SPEED
 
    def moveBackward( self ):
-      self.xMovement -= .5
+      self.xMovement -= CAMERA_SPEED
 
    def moveLeft( self ):
-      self.yMovement += .5
+      self.yMovement += CAMERA_SPEED
 
    def moveRight( self ):
-      self.yMovement -= .5
+      self.yMovement -= CAMERA_SPEED
 
