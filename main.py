@@ -113,7 +113,7 @@ vertexUVId = glGetAttribLocation(programId, b'vertexUV')
 
 textureId = loadBMP( "textures/uvtemplate.bmp" )
 
-camera = Camera(position = [0.0, -2.0, -9.0])
+camera = Camera(position = [0.0, 0.0, 0.0])
 
 inputHandler = InputHandler()
 inputHandler.keyBind( K_ESCAPE, quit )
