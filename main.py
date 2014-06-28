@@ -40,7 +40,7 @@ clock = pygame.time.Clock()
 pygame.font.init()
 fpsFont = pygame.font.Font( pygame.font.get_default_font(), 14 )
 
-glEnable( GL_CULL_FACE )
+#glEnable( GL_CULL_FACE )
 glEnable( GL_DEPTH_TEST )
 glDepthFunc(GL_LESS)
 
