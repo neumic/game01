@@ -22,7 +22,7 @@ from numpy import random
 from command import *
 from camera  import Camera
 from loaders import *
-from terrain import Terrain
+from terrain import Terrain,Grass
 
 HEIGHT = 800
 WIDTH = 1280
@@ -34,7 +34,7 @@ pygame.init()
 screen = pygame.display.set_mode( (WIDTH,HEIGHT),
    HWSURFACE|OPENGL|DOUBLEBUF|OPENGLBLIT )
 pygame.mouse.set_visible( False )
-pygame.event.set_grab( True ) 
+#pygame.event.set_grab( True ) 
 pygame.display.toggle_fullscreen()
 clock = pygame.time.Clock()
 pygame.font.init()
@@ -46,6 +46,7 @@ glDepthFunc(GL_LESS)
 
 glClearColor( 0.1, 0.1, 0.5, 0. )
 
+#set up the terrain shaders
 programId = loadShaders( "shaders/terrain_noise.vertexshader",
                          "shaders/simple.fragmentshader" )
 matrixId = glGetUniformLocation( programId, b'MVP' )
@@ -53,11 +54,30 @@ textureSamplerId = glGetUniformLocation( programId, b'textureSampler' )
 offsetId = glGetUniformLocation( programId, b'offset' )
 iterationId = glGetUniformLocation( programId, b'noiseIteration' )
 timeId = glGetUniformLocation( programId, b'time' )
+vertexPosition_modelspaceID = glGetAttribLocation(programId, b'vertexPosition_modelspace')
+vertexUVId = glGetAttribLocation(programId, b'vertexUV')
+
+
+#set up the grass shaders
+grassProgramId = loadShaders( "shaders/grass_shader.vertexshader",
+                         "shaders/simple.fragmentshader" )
+grassMatrixId = glGetUniformLocation( grassProgramId, b'MVP' )
+grassTextureSamplerId = glGetUniformLocation( grassProgramId, b'textureSampler' )
+grassOffsetId = glGetUniformLocation( grassProgramId, b'offset' )
+grassIterationId = glGetUniformLocation( grassProgramId, b'noiseIteration' )
+grassTimeId = glGetUniformLocation( grassProgramId, b'time' )
+grassVertexPosition_modelspaceID = glGetAttribLocation(grassProgramId, b'vertexPosition_modelspace')
+grassVertexUVId = glGetAttribLocation(grassProgramId, b'vertexUV')
 
 terrain = Terrain( 256, 256 )
 vert_array, index_array = terrain.get_arrays()
 vert_vbo = vbo.VBO( vert_array )
 index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
+
+grass = Grass()
+grass_vert_array, grass_index_array = grass.get_arrays()
+grass_vert_vbo = vbo.VBO( grass_vert_array )
+grass_index_vbo = vbo.VBO( grass_index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
 ##Framebuffer rendering code
 framebufferName = glGenFramebuffers(1)
@@ -108,9 +128,6 @@ quad_vertexPosition_modelspace = glGetAttribLocation(quad_programId, b'vertexPos
 texID = glGetUniformLocation(quad_programId, b'renderedTexture');
 #timeID = glGetUniformLocation(quad_programId, b'time');
 
-vertexPosition_modelspaceID = glGetAttribLocation(programId, b'vertexPosition_modelspace')
-vertexUVId = glGetAttribLocation(programId, b'vertexUV')
-
 textureId = loadBMP( "textures/uvtemplate.bmp" )
 
 camera = Camera(position = [0.0, 0.0, 0.0])
@@ -136,8 +153,6 @@ while True:
    glViewport(0,0,HEIGHT,WIDTH)
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
-   glUseProgram( programId )
-
    timePassed = clock.tick()
 
    camera.regenProjectionMatrix()
@@ -146,6 +161,9 @@ while True:
    view = camera.getViewMatrix()
    model = array(mat4.create_identity(), dtype=float32)
    MVP = array( mat4.multiply(mat4.multiply(model, view), projection ), dtype=float32)
+
+   #render terrain
+   glUseProgram( programId )
 
    glUniformMatrix4fv( matrixId, 1, GL_FALSE, MVP )
    glActiveTexture(GL_TEXTURE0)
@@ -166,6 +184,30 @@ while True:
 
    vert_vbo.unbind()
    index_vbo.unbind()
+   glDisableClientState(GL_VERTEX_ARRAY)
+
+   #render grass
+   glUseProgram( grassProgramId )
+
+   glUniformMatrix4fv( grassMatrixId, 1, GL_FALSE, MVP )
+   glActiveTexture(GL_TEXTURE0)
+   glBindTexture(GL_TEXTURE_2D, textureId)
+   glUniform1i(textureSamplerId, 0);
+
+   glUniform1f( grassIterationId, 6.0)
+   glUniform1f( grassTimeId, time/100.0 )
+   glUniform3fv( grassOffsetId, 1, array(camera.position ) )
+
+   glEnableClientState(GL_VERTEX_ARRAY)
+   grass_vert_vbo.bind()
+   grass_index_vbo.bind()
+
+   glVertexPointerf( grass_vert_vbo )
+
+   glDrawElements( GL_TRIANGLES, len(grass_index_vbo.flat), GL_UNSIGNED_INT, grass_index_vbo )
+
+   grass_vert_vbo.unbind()
+   grass_index_vbo.unbind()
    glDisableClientState(GL_VERTEX_ARRAY)
 
 ###DRAWING THE FULL SCREEN QUAD

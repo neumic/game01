@@ -3,7 +3,7 @@ from pyrr import matrix44 as mat4
 from pyrr import vector
 import math
 
-CAMERA_SPEED = 2.5
+CAMERA_SPEED = 0.5
 
 def lookAtMatrix( camera, target, up ):
    forward = vector.normalise(target - camera)
@@ -22,7 +22,7 @@ def lookAtMatrix( camera, target, up ):
    #return array(matrix2 , dtype=float32)
 
 class Camera:
-   def __init__(self, position = [0., 0., 0.], fov = 45.0, aspect = 1.0):
+   def __init__(self, position = [0., 0., 0.], fov = 60.0, aspect = 1.0):
       self.horizontalAngle = 0.0
       self.verticalAngle = 0.0
       self.fov = fov
