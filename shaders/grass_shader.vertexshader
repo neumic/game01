@@ -293,16 +293,20 @@ void main(){
    float y = vertexPosition_modelspace.y;
    float z = vertexPosition_modelspace.z;
 
-   float aprox_dist = abs(vertexPosition_modelspace.x) + abs(vertexPosition_modelspace.z);
-   float foobar = 2* aprox_dist;
+   vec3 vertex_offset = vec3(0.01* (x - offset.x), 0.0, 0.01* (z - offset.z) );
+   vec3 camera_offset = vec3(-0.01*offset.x,0.0,-0.01*offset.z);
+   float radius = 40.0;
+   float radial_distance = length(vec2( x, z )) / radius ; //0.0-1.0 distance to radius
+   float flatten_height = sin( radial_distance * 3.1415926353 ) * radius;
 
-   float repeatDistance = 15;
-   x += mod(offset.x + foobar, repeatDistance);
-   z += mod(offset.z + foobar, repeatDistance);
+   float height = y;
+/*
+	float height = y - flatten_height
+                    - 8.0;
 
-   float grow_height = 6*abs(sin( 3.1415926535*(offset.x + foobar)/repeatDistance ) * sin( 3.1415926535*(offset.z + foobar)/repeatDistance )) - 4;
-
-	float height = y + 32.0 * snoise(vec3(0.01* (x - offset.x), 0.0, 0.01* (z - offset.z) ) ) - 32 * snoise( vec3(-0.01*offset.x,0.0,-0.01*offset.z) ) - 6 + grow_height;
+   float height = y + radius
+                    + flatten_height;
+*/
 
 	gl_Position =  MVP * vec4(x, height, z, 1.0);
    UV = vertexUV;

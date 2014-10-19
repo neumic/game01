@@ -22,7 +22,7 @@ from numpy import random
 from command import *
 from camera  import Camera
 from loaders import *
-from terrain import Terrain,Grass
+from terrain import Terrain,Grass,Grass_sphere
 
 HEIGHT = 800
 WIDTH = 1280
@@ -62,7 +62,6 @@ vertexUVId = glGetAttribLocation(programId, b'vertexUV')
 grassProgramId = loadShaders( "shaders/grass_shader.vertexshader",
                          "shaders/simple.fragmentshader" )
 grassMatrixId = glGetUniformLocation( grassProgramId, b'MVP' )
-grassTextureSamplerId = glGetUniformLocation( grassProgramId, b'textureSampler' )
 grassOffsetId = glGetUniformLocation( grassProgramId, b'offset' )
 grassIterationId = glGetUniformLocation( grassProgramId, b'noiseIteration' )
 grassTimeId = glGetUniformLocation( grassProgramId, b'time' )
@@ -74,7 +73,7 @@ vert_array, index_array = terrain.get_arrays()
 vert_vbo = vbo.VBO( vert_array )
 index_vbo = vbo.VBO( index_array, target = GL_ELEMENT_ARRAY_BUFFER )
 
-grass = Grass()
+grass = Grass_sphere( 40, 1600 )
 grass_vert_array, grass_index_array = grass.get_arrays()
 grass_vert_vbo = vbo.VBO( grass_vert_array )
 grass_index_vbo = vbo.VBO( grass_index_array, target = GL_ELEMENT_ARRAY_BUFFER )
@@ -192,7 +191,6 @@ while True:
    glUniformMatrix4fv( grassMatrixId, 1, GL_FALSE, MVP )
    glActiveTexture(GL_TEXTURE0)
    glBindTexture(GL_TEXTURE_2D, textureId)
-   glUniform1i(textureSamplerId, 0);
 
    glUniform1f( grassIterationId, 6.0)
    glUniform1f( grassTimeId, time/100.0 )
